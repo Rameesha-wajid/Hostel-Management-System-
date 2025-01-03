@@ -1,0 +1,252 @@
+#include <iostream>
+#include <string>
+#include <iomanip> // for table formatting
+using namespace std;
+
+// Struct to store room and user details
+struct Room {
+    string roomInfo;      // Room description
+    bool isBooked;        // Booking status
+    string name;          // User name
+    string contact;       // User contact
+    string payment;       // Payment status
+    string lunchService;  // Lunch service details
+    string cleaningService; // Cleaning service details
+};
+
+// Global variables
+const int totalRooms = 5; // Total number of rooms
+Room rooms[totalRooms] = {
+    {"Room 101 (Single) - Rs.200/month", false, "", "", "", "", ""},
+    {"Room 102 (Double) - Rs.300/month", false, "", "", "", "", ""},
+    {"Room 103 (Deluxe) - Rs.400/month", false, "", "", "", "", ""},
+    {"Room 104 (Single) - Rs.200/month", false, "", "", "", "", ""},
+    {"Room 105 (Double) - Rs.300/month", false, "", "", "", "", ""}
+};
+
+// Function prototypes
+void showAvailableRooms();
+void bookRoom();
+void makePayment(int roomIndex);
+void selectServices(int roomIndex);
+void displayDetails();
+void cancelBooking();
+void displaySummary();
+void displayUnpaidBookings();
+void confirmExit();
+
+int main() {
+    int choice;
+    cout << "\n ---------------------------------Welcome to A&R's Girl's Hostel Management System---------------------------------\n";
+    while (true) {
+        cout << "\n 1. Check Available Rooms\n";
+        cout << " 2. Book a Room\n";
+        cout << " 3. Show All Details\n";
+        cout << " 4. Cancel a Booking\n";
+        cout << " 5. Display Summary\n";
+        cout << " 6. Display Unpaid Bookings\n";
+        cout << " 7. Exit\n";
+        cout << " Enter your choices between (1-7): ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: showAvailableRooms();
+             break;
+            case 2: bookRoom();
+             break;
+            case 3: displayDetails();
+             break;
+            case 4: cancelBooking();
+             break;
+            case 5: displaySummary();
+             break;
+            case 6: displayUnpaidBookings();
+             break;
+            case 7: confirmExit();
+             break;
+            default: cout << " Invalid choice! Please try again.\n";
+        }
+    }
+    return 0;
+}
+
+// Function to display available rooms
+void showAvailableRooms() {
+    cout << "\n Available Rooms:\n";
+    for (int i = 0; i < totalRooms; i++) {
+        if (!rooms[i].isBooked) {
+            cout << rooms[i].roomInfo << " is available.\n";
+        }
+    }
+}
+
+// Function to book a room
+void bookRoom() {
+    showAvailableRooms();
+    int roomNumber;
+    cout << " Enter the room number you want to book (e.g., 101): ";
+    cin >> roomNumber;
+
+    int roomIndex = roomNumber % 100 - 1; // Convert room number to index
+
+    if (roomIndex < 0 || roomIndex >= totalRooms) {
+        cout << " Invalid room number! Please try again.\n";
+        return;
+    }
+
+    if (rooms[roomIndex].isBooked) {
+        cout << " " << rooms[roomIndex].roomInfo << " is already booked. Please try another room.\n";
+        return;
+    }
+
+    rooms[roomIndex].isBooked = true;
+
+    cout << "Enter your name: ";
+    cin.ignore();
+    getline(cin, rooms[roomIndex].name);
+
+    cout << "Enter your contact number: ";
+    getline(cin, rooms[roomIndex].contact);
+
+    makePayment(roomIndex);
+    selectServices(roomIndex);
+
+    cout << rooms[roomIndex].roomInfo << " successfully booked for you!\n";
+}
+
+// Function to handle payment
+void makePayment(int roomIndex) {
+    string paymentStatus;
+    cout << "Have you made the payment? (yes/no): ";
+    cin >> paymentStatus;
+
+    if (paymentStatus == "yes"||paymentStatus=="YES") {
+        rooms[roomIndex].payment = "Paid";
+    } else {
+        rooms[roomIndex].payment = "Not Paid";
+        cout << "Warning: Please make the payment as soon as possible!\n";
+    }
+}
+
+// Function to select additional services
+void selectServices(int roomIndex) {
+    string lunchServiceOption, cleaningServiceOption;
+
+    cout << "\nLunch Service:\n";
+    cout << "1. Avail Membership (Rs.50/month)\n";
+    cout << "2. Pay per Meal (Rs.5/meal)\n";
+    cout << "Enter your choice (1/2): ";
+    cin >> lunchServiceOption;
+    if (lunchServiceOption == "1") {
+        rooms[roomIndex].lunchService = "Membership (Rs.50/month)";
+    } else if (lunchServiceOption == "2") {
+        rooms[roomIndex].lunchService = "Pay per Meal (Rs.5/meal)";
+    } else {
+        rooms[roomIndex].lunchService = "None";
+    }
+
+    cout << "\nCleaning Services:\n";
+    cout << "1. Room Cleaning Only (Rs.10/month)\n";
+    cout << "2. Laundry Only (Rs.15/month)\n";
+    cout << "3. Both Services (Rs.20/month)\n";
+    cout << "4. None\n";
+    cout << "Enter your choice (1-4): ";
+    cin >> cleaningServiceOption;
+
+    if (cleaningServiceOption == "1") {
+        rooms[roomIndex].cleaningService = "Room Cleaning Only (Rs.10/month)";
+    } else if (cleaningServiceOption == "2") {
+        rooms[roomIndex].cleaningService = "Laundry Only (Rs.15/month)";
+    } else if (cleaningServiceOption == "3") {
+        rooms[roomIndex].cleaningService = "Both Services (Rs.20/month)";
+    } else {
+        rooms[roomIndex].cleaningService = "None";
+    }
+}
+
+// Function to cancel booking
+void cancelBooking() {
+    int roomNumber;
+    cout << "Enter the room number you want to cancel (e.g., 101): ";
+    cin >> roomNumber;
+
+    int roomIndex = roomNumber % 100 - 1;
+
+    if (roomIndex < 0 || roomIndex >= totalRooms || !rooms[roomIndex].isBooked) {
+        cout << "Invalid room number or room not booked!\n";
+        return;
+    }
+
+    rooms[roomIndex].isBooked = false;
+    rooms[roomIndex].name = "";
+    rooms[roomIndex].contact = "";
+    rooms[roomIndex].payment = "";
+    rooms[roomIndex].lunchService = "";
+    rooms[roomIndex].cleaningService = "";
+
+    cout << "Booking for " << rooms[roomIndex].roomInfo << " has been canceled.\n";
+}
+
+// Function to display summary
+void displaySummary() {
+    int available = 0, booked = 0;
+    for (int i = 0; i < totalRooms; i++) {
+        if (rooms[i].isBooked) booked++;
+        else available++;
+    }
+    cout << "\nSummary:\n";
+    cout << "Total Rooms: " << totalRooms << "\n";
+    cout << "Available Rooms: " << available << "\n";
+    cout << "Booked Rooms: " << booked << "\n";
+}
+
+// Function to display unpaid bookings
+void displayUnpaidBookings() {
+    cout << "\nUnpaid Bookings:\n";
+    bool unpaidExists = false;
+    for (int i = 0; i < totalRooms; i++) {
+        if (rooms[i].isBooked && rooms[i].payment == "Not Paid") {
+            cout << rooms[i].roomInfo << " - " << rooms[i].name << "\n";
+            unpaidExists = true;
+        }
+    }
+    if (!unpaidExists) {
+        cout << "No unpaid bookings found.\n";
+    }
+}
+
+// Function to display all booked rooms
+void displayDetails() {
+    cout << "\nRoom Booking Details:\n";
+    cout << left << setw(20) << "Name"
+         << setw(15) << "Contact"
+         << setw(15) << "Payment"
+         << setw(30) << "Lunch Service"
+         << setw(33) << "Cleaning Services"
+         << setw(10) << "Room\n";
+    cout << "-------------------------------------------------------------------------------------------------------------\n";
+
+    for (int i = 0; i < totalRooms; i++) {
+        if (rooms[i].isBooked) {
+            cout << left << setw(20) << rooms[i].name
+                 << setw(15) << rooms[i].contact
+                 << setw(15) << rooms[i].payment
+                 << setw(30) << rooms[i].lunchService
+                 << setw(30) << rooms[i].cleaningService
+                 << setw(10) << rooms[i].roomInfo << "\n";
+        }
+    }
+}
+
+// Function to confirm exit
+void confirmExit() {
+    char confirm;
+    cout << "Are you sure you want to exit? (y/n): ";
+    cin >> confirm;
+    if (confirm == 'y' || confirm == 'Y') {
+        cout << "Thank you for visiting us!\n";
+        exit(0);
+    } else {
+        cout << "Returning to main menu...\n";
+    }
+}
